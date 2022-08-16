@@ -13,6 +13,7 @@ use DateTimeInterface;
  * @method Context           setHostname(string|null $hostname)
  * @method Context           setEnvironment(string|null $environment)
  * @method Context           setCurrentTime(DateTimeInterface|null $time)
+ * @method array<string,     string> getCustomProperties()
  */
 interface Context
 {
@@ -24,6 +25,9 @@ interface Context
 
     public function getCustomProperty(string $name): string;
 
+    /**
+     * @todo make $value nullable
+     */
     public function setCustomProperty(string $name, string $value): self;
 
     public function hasCustomProperty(string $name): bool;
