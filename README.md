@@ -17,7 +17,7 @@ You may also be interested in the [Symfony Bundle](https://github.com/Unleash/un
 
 `composer require unleash/client`
 
-Requires PHP 7.2 or newer.
+Requires PHP 7.0 or newer.
 
 > You will also need some implementation of [PSR-18](https://packagist.org/providers/psr/http-client-implementation)
 > and [PSR-17](https://packagist.org/providers/psr/http-factory-implementation), for example 
