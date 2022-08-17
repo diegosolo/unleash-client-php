@@ -7,5 +7,10 @@ use Unleash\Client\DTO\Variant;
 
 interface MetricsHandler
 {
-    public function handleMetrics(Feature $feature, bool $successful, Variant $variant = null): void;
+    /**
+     * @param \Unleash\Client\DTO\Feature $feature
+     * @param bool $successful
+     * @param \Unleash\Client\DTO\Variant|null $variant
+     */
+    public function handleMetrics($feature, $successful, $variant = null): void;
 }

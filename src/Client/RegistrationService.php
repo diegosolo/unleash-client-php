@@ -9,5 +9,5 @@ interface RegistrationService
     /**
      * @param iterable<StrategyHandler> $strategyHandlers
      */
-    public function register(iterable $strategyHandlers): bool;
+    public function register($strategyHandlers): bool;
 }

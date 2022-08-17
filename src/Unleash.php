@@ -9,9 +9,19 @@ interface Unleash
 {
     public const SDK_VERSION = '1.7.0';
 
-    public function isEnabled(string $featureName, ?Context $context = null, bool $default = false): bool;
+    /**
+     * @param string $featureName
+     * @param \Unleash\Client\Configuration\Context|null $context
+     * @param bool $default
+     */
+    public function isEnabled($featureName, $context = null, $default = false): bool;
 
-    public function getVariant(string $featureName, ?Context $context = null, ?Variant $fallbackVariant = null): Variant;
+    /**
+     * @param string $featureName
+     * @param \Unleash\Client\Configuration\Context|null $context
+     * @param \Unleash\Client\DTO\Variant|null $fallbackVariant
+     */
+    public function getVariant($featureName, $context = null, $fallbackVariant = null): Variant;
 
     public function register(): bool;
 }

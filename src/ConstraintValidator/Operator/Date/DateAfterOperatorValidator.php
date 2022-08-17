@@ -7,7 +7,11 @@ namespace Unleash\Client\ConstraintValidator\Operator\Date;
  */
 final class DateAfterOperatorValidator extends AbstractDateOperatorValidator
 {
-    protected function validate(string $currentValue, array|string $searchInValue): bool
+    /**
+     * @param mixed[]|string $searchInValue
+     * @param string $currentValue
+     */
+    protected function validate($currentValue, $searchInValue): bool
     {
         assert(is_string($searchInValue));
 

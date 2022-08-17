@@ -7,7 +7,11 @@ use Unleash\Client\DTO\Strategy;
 
 final class DefaultStrategyHandler extends AbstractStrategyHandler
 {
-    public function isEnabled(Strategy $strategy, Context $context): bool
+    /**
+     * @param \Unleash\Client\DTO\Strategy $strategy
+     * @param \Unleash\Client\Configuration\Context $context
+     */
+    public function isEnabled($strategy, $context): bool
     {
         if (!$this->validateConstraints($strategy, $context)) {
             return false;

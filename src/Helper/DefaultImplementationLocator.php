@@ -23,7 +23,7 @@ final class DefaultImplementationLocator
     /**
      * @var array<string,string[]>
      */
-    private array $supportedPackages = [
+    private $supportedPackages = [
         'cache' => [
             'symfony/cache',
             'cache/filesystem-adapter',
@@ -33,7 +33,7 @@ final class DefaultImplementationLocator
     /**
      * @var array<string,array<string,array<mixed>>>
      */
-    private array $defaultImplementations = [
+    private $defaultImplementations = [
         'cache' => [
             FilesystemCachePool::class => [
                 Filesystem::class => [
@@ -114,8 +114,9 @@ final class DefaultImplementationLocator
     /**
      * @param class-string            $class
      * @param array<int|string,mixed> $parameters
+     * @return object
      */
-    private function constructObject(string $class, array $parameters): object
+    private function constructObject(string $class, array $parameters)
     {
         if (!class_exists($class)) {
             // @codeCoverageIgnoreStart
@@ -138,7 +139,7 @@ final class DefaultImplementationLocator
                 }
                 $resolvedParameters[] = $this->constructObject($parameter, $value);
             } else {
-                if (is_string($value) && str_contains($value, '{{tmpDir}}')) {
+                if (is_string($value) && strpos($value, '{{tmpDir}}') !== false) {
                     $value = str_replace('{{tmpDir}}', sys_get_temp_dir(), $value);
                 }
                 $resolvedParameters[] = $value;

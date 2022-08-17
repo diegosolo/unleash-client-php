@@ -12,8 +12,10 @@ final class IpAddressStrategyHandler extends AbstractStrategyHandler
 {
     /**
      * @throws MissingArgumentException
+     * @param \Unleash\Client\DTO\Strategy $strategy
+     * @param \Unleash\Client\Configuration\Context $context
      */
-    public function isEnabled(Strategy $strategy, Context $context): bool
+    public function isEnabled($strategy, $context): bool
     {
         if (!$ipAddresses = $this->findParameter('IPs', $strategy)) {
             throw new MissingArgumentException("The remote server did not return 'IPs' config");
@@ -26,7 +28,7 @@ final class IpAddressStrategyHandler extends AbstractStrategyHandler
             foreach ($ipAddresses as $ipAddress) {
                 try {
                     $calculator = NetworkCalculator::fromString($ipAddress);
-                } catch (InvalidIpAddressException) {
+                } catch (InvalidIpAddressException $exception) {
                     continue;
                 }
                 if ($calculator->isInRange($currentIpAddress)) {

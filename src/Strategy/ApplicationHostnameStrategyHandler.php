@@ -12,7 +12,11 @@ final class ApplicationHostnameStrategyHandler extends AbstractStrategyHandler
         return 'applicationHostname';
     }
 
-    public function isEnabled(Strategy $strategy, Context $context): bool
+    /**
+     * @param \Unleash\Client\DTO\Strategy $strategy
+     * @param \Unleash\Client\Configuration\Context $context
+     */
+    public function isEnabled($strategy, $context): bool
     {
         if (!$hostnames = $this->findParameter('hostNames', $strategy)) {
             return false;

@@ -11,5 +11,8 @@ use Unleash\Client\Configuration\Context;
 #[Deprecated('This interface will be removed in next major version')]
 interface SettableUnleashContextProvider extends UnleashContextProvider
 {
-    public function setDefaultContext(Context $context): self;
+    /**
+     * @param \Unleash\Client\Configuration\Context $context
+     */
+    public function setDefaultContext($context): self;
 }

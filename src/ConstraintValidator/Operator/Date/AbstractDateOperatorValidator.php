@@ -12,7 +12,10 @@ use Unleash\Client\ConstraintValidator\Operator\AbstractOperatorValidator;
  */
 abstract class AbstractDateOperatorValidator extends AbstractOperatorValidator
 {
-    protected function acceptsValues(array|string $values): bool
+    /**
+     * @param mixed[]|string $values
+     */
+    protected function acceptsValues($values): bool
     {
         if (!is_string($values)) {
             return false;
@@ -22,12 +25,15 @@ abstract class AbstractDateOperatorValidator extends AbstractOperatorValidator
             new DateTimeImmutable($values);
 
             return true;
-        } catch (Exception) {
+        } catch (Exception $exception) {
             return false;
         }
     }
 
-    protected function convert(string $dateString): DateTimeInterface
+    /**
+     * @param string $dateString
+     */
+    protected function convert($dateString): DateTimeInterface
     {
         return new DateTimeImmutable($dateString);
     }

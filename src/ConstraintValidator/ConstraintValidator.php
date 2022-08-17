@@ -7,5 +7,9 @@ use Unleash\Client\DTO\Constraint;
 
 interface ConstraintValidator
 {
-    public function validateConstraint(Constraint $constraint, Context $context): bool;
+    /**
+     * @param \Unleash\Client\DTO\Constraint $constraint
+     * @param \Unleash\Client\Configuration\Context $context
+     */
+    public function validateConstraint($constraint, $context): bool;
 }

@@ -4,5 +4,10 @@ namespace Unleash\Client\Stickiness;
 
 interface StickinessCalculator
 {
-    public function calculate(string $id, string $groupId, int $normalizer = 100): int;
+    /**
+     * @param string $id
+     * @param string $groupId
+     * @param int $normalizer
+     */
+    public function calculate($id, $groupId, $normalizer = 100): int;
 }
