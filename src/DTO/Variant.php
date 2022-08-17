@@ -12,7 +12,10 @@ interface Variant extends JsonSerializable
 
     public function isEnabled(): bool;
 
-    public function getPayload(): ?VariantPayload;
+    /**
+     * @return \Unleash\Client\DTO\VariantPayload|null
+     */
+    public function getPayload();
 
     public function getWeight(): int;
 

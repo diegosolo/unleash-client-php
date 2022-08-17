@@ -4,11 +4,11 @@ namespace Unleash\Client\Enum;
 
 final class Stickiness
 {
-    public const USER_ID = 'userid';
+    const USER_ID = 'userid';
 
-    public const SESSION_ID = 'sessionid';
+    const SESSION_ID = 'sessionid';
 
-    public const RANDOM = 'random';
+    const RANDOM = 'random';
 
-    public const DEFAULT = 'default';
+    const DEFAULT = 'default';
 }

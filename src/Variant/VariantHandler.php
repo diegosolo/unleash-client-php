@@ -10,5 +10,10 @@ interface VariantHandler
 {
     public function getDefaultVariant(): Variant;
 
-    public function selectVariant(Feature $feature, Context $context): ?Variant;
+    /**
+     * @param \Unleash\Client\DTO\Feature $feature
+     * @param \Unleash\Client\Configuration\Context $context
+     * @return \Unleash\Client\DTO\Variant|null
+     */
+    public function selectVariant($feature, $context);
 }

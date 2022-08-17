@@ -11,42 +11,80 @@ use Unleash\Client\Exception\InvalidValueException;
 final class UnleashContext implements Context
 {
     /**
-     * @param array<string,string> $customContext
+     * @var string|null
      */
-    public function __construct(
-        private ?string $currentUserId = null,
-        private ?string $ipAddress = null,
-        private ?string $sessionId = null,
-        private array $customContext = [],
-        ?string $hostname = null,
-        private ?string $environment = null,
-        DateTimeInterface|string|null $currentTime = null,
-    ) {
+    private $currentUserId;
+    /**
+     * @var string|null
+     */
+    private $ipAddress;
+    /**
+     * @var string|null
+     */
+    private $sessionId;
+    /**
+     * @var array<string, string>
+     */
+    private $customContext = [];
+    /**
+     * @var string|null
+     */
+    private $environment;
+    /**
+     * @param array<string,string> $customContext
+     * @param \DateTimeInterface|string|null $currentTime
+     * @param string|null $currentUserId
+     * @param string|null $ipAddress
+     * @param string|null $sessionId
+     * @param string|null $hostname
+     * @param string|null $environment
+     */
+    public function __construct($currentUserId = null, $ipAddress = null, $sessionId = null, array $customContext = [], $hostname = null, $environment = null, $currentTime = null)
+    {
+        $this->currentUserId = $currentUserId;
+        $this->ipAddress = $ipAddress;
+        $this->sessionId = $sessionId;
+        $this->customContext = $customContext;
+        $this->environment = $environment;
         $this->setHostname($hostname);
         $this->setCurrentTime($currentTime);
     }
-
-    public function getCurrentUserId(): ?string
+    /**
+     * @return string|null
+     */
+    public function getCurrentUserId()
     {
         return $this->currentUserId;
     }
 
-    public function getEnvironment(): ?string
+    /**
+     * @return string|null
+     */
+    public function getEnvironment()
     {
         return $this->environment;
     }
 
-    public function getIpAddress(): ?string
+    /**
+     * @return string|null
+     */
+    public function getIpAddress()
     {
         return $this->ipAddress ?? $_SERVER['REMOTE_ADDR'] ?? null;
     }
 
-    public function getSessionId(): ?string
+    /**
+     * @return string|null
+     */
+    public function getSessionId()
     {
         return $this->sessionId ?? (session_id() ?: null);
     }
 
-    public function getCustomProperty(string $name): string
+    /**
+     * @param string $name
+     */
+    public function getCustomProperty($name): string
     {
         if (!array_key_exists($name, $this->customContext)) {
             throw new InvalidValueException("The custom context value '{$name}' does not exist");
@@ -55,19 +93,32 @@ final class UnleashContext implements Context
         return $this->customContext[$name];
     }
 
-    public function setCustomProperty(string $name, ?string $value): self
+    /**
+     * @return $this
+     * @param string $name
+     * @param string|null $value
+     */
+    public function setCustomProperty($name, $value): \Unleash\Client\Configuration\Context
     {
         $this->customContext[$name] = $value ?? '';
 
         return $this;
     }
 
-    public function hasCustomProperty(string $name): bool
+    /**
+     * @param string $name
+     */
+    public function hasCustomProperty($name): bool
     {
         return array_key_exists($name, $this->customContext);
     }
 
-    public function removeCustomProperty(string $name, bool $silent = true): self
+    /**
+     * @return $this
+     * @param string $name
+     * @param bool $silent
+     */
+    public function removeCustomProperty($name, $silent = true): \Unleash\Client\Configuration\Context
     {
         if (!$this->hasCustomProperty($name) && !$silent) {
             throw new InvalidValueException("The custom context value '{$name}' does not exist");
@@ -78,40 +129,61 @@ final class UnleashContext implements Context
         return $this;
     }
 
-    public function setCurrentUserId(?string $currentUserId): self
+    /**
+     * @return $this
+     * @param string|null $currentUserId
+     */
+    public function setCurrentUserId($currentUserId): \Unleash\Client\Configuration\Context
     {
         $this->currentUserId = $currentUserId;
 
         return $this;
     }
 
-    public function setIpAddress(?string $ipAddress): self
+    /**
+     * @return $this
+     * @param string|null $ipAddress
+     */
+    public function setIpAddress($ipAddress): \Unleash\Client\Configuration\Context
     {
         $this->ipAddress = $ipAddress;
 
         return $this;
     }
 
-    public function setSessionId(?string $sessionId): self
+    /**
+     * @return $this
+     * @param string|null $sessionId
+     */
+    public function setSessionId($sessionId): \Unleash\Client\Configuration\Context
     {
         $this->sessionId = $sessionId;
 
         return $this;
     }
 
-    public function setEnvironment(?string $environment): self
+    /**
+     * @param string|null $environment
+     */
+    public function setEnvironment($environment): self
     {
         $this->environment = $environment;
 
         return $this;
     }
 
-    public function getHostname(): ?string
+    /**
+     * @return string|null
+     */
+    public function getHostname()
     {
         return $this->findContextValue(ContextField::HOSTNAME) ?? (gethostname() ?: null);
     }
 
-    public function setHostname(?string $hostname): self
+    /**
+     * @param string|null $hostname
+     */
+    public function setHostname($hostname): self
     {
         if ($hostname === null) {
             $this->removeCustomProperty(ContextField::HOSTNAME);
@@ -124,8 +196,9 @@ final class UnleashContext implements Context
 
     /**
      * @param array<string> $values
+     * @param string $fieldName
      */
-    public function hasMatchingFieldValue(string $fieldName, array $values): bool
+    public function hasMatchingFieldValue($fieldName, $values): bool
     {
         $fieldValue = $this->findContextValue($fieldName);
         if ($fieldValue === null) {
@@ -135,16 +208,28 @@ final class UnleashContext implements Context
         return in_array($fieldValue, $values, true);
     }
 
-    public function findContextValue(string $fieldName): ?string
+    /**
+     * @param string $fieldName
+     * @return string|null
+     */
+    public function findContextValue($fieldName)
     {
-        return match ($fieldName) {
-            ContextField::USER_ID, Stickiness::USER_ID => $this->getCurrentUserId(),
-            ContextField::SESSION_ID, Stickiness::SESSION_ID => $this->getSessionId(),
-            ContextField::IP_ADDRESS => $this->getIpAddress(),
-            ContextField::ENVIRONMENT => $this->getEnvironment(),
-            ContextField::CURRENT_TIME => $this->getCurrentTime()->format(DateTimeInterface::ISO8601),
-            default => $this->customContext[$fieldName] ?? null,
-        };
+        switch ($fieldName) {
+            case ContextField::USER_ID:
+            case Stickiness::USER_ID:
+                return $this->getCurrentUserId();
+            case ContextField::SESSION_ID:
+            case Stickiness::SESSION_ID:
+                return $this->getSessionId();
+            case ContextField::IP_ADDRESS:
+                return $this->getIpAddress();
+            case ContextField::ENVIRONMENT:
+                return $this->getEnvironment();
+            case ContextField::CURRENT_TIME:
+                return $this->getCurrentTime()->format(DateTimeInterface::ISO8601);
+            default:
+                return $this->customContext[$fieldName] ?? null;
+        }
     }
 
     public function getCurrentTime(): DateTimeInterface
@@ -156,7 +241,10 @@ final class UnleashContext implements Context
         return new DateTimeImmutable($this->getCustomProperty('currentTime'));
     }
 
-    public function setCurrentTime(DateTimeInterface|string|null $time): self
+    /**
+     * @param \DateTimeInterface|string|null $time
+     */
+    public function setCurrentTime($time): self
     {
         if ($time === null) {
             $this->removeCustomProperty('currentTime');

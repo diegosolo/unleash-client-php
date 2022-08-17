@@ -12,9 +12,9 @@ interface Feature
     public function isEnabled(): bool;
 
     /**
-     * @return iterable<Strategy>
+     * @return mixed[]
      */
-    public function getStrategies(): iterable;
+    public function getStrategies();
 
     /**
      * @return array<Variant>

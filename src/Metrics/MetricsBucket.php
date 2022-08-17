@@ -15,15 +15,29 @@ final class MetricsBucket implements JsonSerializable
     /**
      * @var array<MetricsBucketToggle>
      */
-    private array $toggles = [];
-
-    public function __construct(
-        private readonly DateTimeInterface $startDate,
-        private ?DateTimeInterface $endDate = null,
-    ) {
+    private $toggles = [];
+    /**
+     * @readonly
+     * @var \DateTimeInterface
+     */
+    private $startDate;
+    /**
+     * @var \DateTimeInterface|null
+     */
+    private $endDate;
+    /**
+     * @param \DateTimeInterface|null $endDate
+     */
+    public function __construct(DateTimeInterface $startDate, $endDate = null)
+    {
+        $this->startDate = $startDate;
+        $this->endDate = $endDate;
     }
 
-    public function addToggle(MetricsBucketToggle $toggle): self
+    /**
+     * @param \Unleash\Client\Metrics\MetricsBucketToggle $toggle
+     */
+    public function addToggle($toggle): self
     {
         $this->toggles[] = $toggle;
 
@@ -35,7 +49,10 @@ final class MetricsBucket implements JsonSerializable
         return $this->startDate;
     }
 
-    public function setEndDate(?DateTimeInterface $endDate): MetricsBucket
+    /**
+     * @param \DateTimeInterface|null $endDate
+     */
+    public function setEndDate($endDate): MetricsBucket
     {
         $this->endDate = $endDate;
 
@@ -68,7 +85,7 @@ final class MetricsBucket implements JsonSerializable
 
             if ($toggle->getVariant() !== null) {
                 $variant = $toggle->getVariant();
-                $togglesArray[$featureName]['variants'][$variant->getName()] ??= 0;
+                $togglesArray[$featureName]['variants'][$variant->getName()] = $togglesArray[$featureName]['variants'][$variant->getName()] ?? 0;
                 ++$togglesArray[$featureName]['variants'][$variant->getName()];
             }
         }

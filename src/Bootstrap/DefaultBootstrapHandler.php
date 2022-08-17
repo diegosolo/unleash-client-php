@@ -9,8 +9,10 @@ final class DefaultBootstrapHandler implements BootstrapHandler
 {
     /**
      * @throws JsonException
+     * @param \Unleash\Client\Bootstrap\BootstrapProvider $provider
+     * @return string|null
      */
-    public function getBootstrapContents(BootstrapProvider $provider): ?string
+    public function getBootstrapContents($provider)
     {
         $bootstrap = $provider->getBootstrap();
         if ($bootstrap === null) {
@@ -21,7 +23,7 @@ final class DefaultBootstrapHandler implements BootstrapHandler
             $bootstrap = iterator_to_array($bootstrap);
         }
 
-        $result = json_encode($bootstrap, JSON_THROW_ON_ERROR);
+        $result = json_encode($bootstrap, 0);
         assert($result !== false);
 
         return $result;

@@ -17,33 +17,68 @@ use DateTimeInterface;
  */
 interface Context
 {
-    public function getCurrentUserId(): ?string;
+    /**
+     * @return string|null
+     */
+    public function getCurrentUserId();
 
-    public function getIpAddress(): ?string;
+    /**
+     * @return string|null
+     */
+    public function getIpAddress();
 
-    public function getSessionId(): ?string;
+    /**
+     * @return string|null
+     */
+    public function getSessionId();
 
-    public function getCustomProperty(string $name): string;
+    /**
+     * @param string $name
+     */
+    public function getCustomProperty($name): string;
 
     /**
      * @todo make $value nullable
+     * @param string $name
+     * @param string $value
      */
-    public function setCustomProperty(string $name, string $value): self;
+    public function setCustomProperty($name, $value): self;
 
-    public function hasCustomProperty(string $name): bool;
+    /**
+     * @param string $name
+     */
+    public function hasCustomProperty($name): bool;
 
-    public function removeCustomProperty(string $name, bool $silent = true): self;
+    /**
+     * @param string $name
+     * @param bool $silent
+     */
+    public function removeCustomProperty($name, $silent = true): self;
 
-    public function setCurrentUserId(?string $currentUserId): self;
+    /**
+     * @param string|null $currentUserId
+     */
+    public function setCurrentUserId($currentUserId): self;
 
-    public function setIpAddress(?string $ipAddress): self;
+    /**
+     * @param string|null $ipAddress
+     */
+    public function setIpAddress($ipAddress): self;
 
-    public function setSessionId(?string $sessionId): self;
+    /**
+     * @param string|null $sessionId
+     */
+    public function setSessionId($sessionId): self;
 
     /**
      * @param array<string> $values
+     * @param string $fieldName
      */
-    public function hasMatchingFieldValue(string $fieldName, array $values): bool;
+    public function hasMatchingFieldValue($fieldName, $values): bool;
 
-    public function findContextValue(string $fieldName): ?string;
+    /**
+     * @param string $fieldName
+     * @return string|null
+     */
+    public function findContextValue($fieldName);
 }

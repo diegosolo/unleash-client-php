@@ -15,7 +15,11 @@ final class StringStream implements StreamInterface
      */
     private $stream;
 
-    private readonly int $size;
+    /**
+     * @readonly
+     * @var int
+     */
+    private $size;
 
     public function __construct(
         string $content
@@ -48,7 +52,10 @@ final class StringStream implements StreamInterface
         return $content;
     }
 
-    public function close(): void
+    /**
+     * @return void
+     */
+    public function close()
     {
         if ($this->stream === null) {
             throw new StreamException('The stream is detached');
@@ -68,7 +75,10 @@ final class StringStream implements StreamInterface
         return $resource;
     }
 
-    public function getSize(): int
+    /**
+     * @return int|null
+     */
+    public function getSize()
     {
         if ($this->stream === null) {
             throw new StreamException('The stream is detached');
@@ -108,7 +118,10 @@ final class StringStream implements StreamInterface
         return true;
     }
 
-    public function seek($offset, $whence = SEEK_SET): void
+    /**
+     * @return void
+     */
+    public function seek($offset, $whence = SEEK_SET)
     {
         if ($this->stream === null) {
             throw new StreamException('The stream is detached');
@@ -116,7 +129,10 @@ final class StringStream implements StreamInterface
         fseek($this->stream, $offset, $whence);
     }
 
-    public function rewind(): void
+    /**
+     * @return void
+     */
+    public function rewind()
     {
         if ($this->stream === null) {
             throw new StreamException('The stream is detached');
@@ -190,7 +206,10 @@ final class StringStream implements StreamInterface
         return $result;
     }
 
-    public function getMetadata($key = null): mixed
+    /**
+     * @return mixed
+     */
+    public function getMetadata($key = null)
     {
         if ($this->stream === null) {
             throw new StreamException('The stream is detached');

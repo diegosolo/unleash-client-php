@@ -4,5 +4,9 @@ namespace Unleash\Client\Bootstrap;
 
 interface BootstrapHandler
 {
-    public function getBootstrapContents(BootstrapProvider $provider): ?string;
+    /**
+     * @param \Unleash\Client\Bootstrap\BootstrapProvider $provider
+     * @return string|null
+     */
+    public function getBootstrapContents($provider);
 }

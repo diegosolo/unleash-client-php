@@ -49,62 +49,116 @@ use Unleash\Client\Variant\DefaultVariantHandler;
 #[Immutable]
 final class UnleashBuilder
 {
-    private DefaultImplementationLocator $defaultImplementationLocator;
+    /**
+     * @var \Unleash\Client\Helper\DefaultImplementationLocator
+     */
+    private $defaultImplementationLocator;
 
-    private ?string $appUrl = null;
+    /**
+     * @var string|null
+     */
+    private $appUrl;
 
-    private ?string $instanceId = null;
+    /**
+     * @var string|null
+     */
+    private $instanceId;
 
-    private ?string $appName = null;
+    /**
+     * @var string|null
+     */
+    private $appName;
 
-    private ?ClientInterface $httpClient = null;
+    /**
+     * @var \Psr\Http\Client\ClientInterface|null
+     */
+    private $httpClient;
 
-    private ?RequestFactoryInterface $requestFactory = null;
+    /**
+     * @var \Psr\Http\Message\RequestFactoryInterface|null
+     */
+    private $requestFactory;
 
-    private ?CacheInterface $cache = null;
+    /**
+     * @var \Psr\SimpleCache\CacheInterface|null
+     */
+    private $cache;
 
-    private ?int $cacheTtl = null;
+    /**
+     * @var int|null
+     */
+    private $cacheTtl;
 
-    private ?int $staleTtl = null;
+    /**
+     * @var int|null
+     */
+    private $staleTtl;
 
-    private ?RegistrationService $registrationService = null;
+    /**
+     * @var \Unleash\Client\Client\RegistrationService|null
+     */
+    private $registrationService;
 
-    private bool $autoregister = true;
+    /**
+     * @var bool
+     */
+    private $autoregister = true;
 
-    private ?bool $metricsEnabled = null;
+    /**
+     * @var bool|null
+     */
+    private $metricsEnabled;
 
-    private ?int $metricsInterval = null;
+    /**
+     * @var int|null
+     */
+    private $metricsInterval;
 
-    private ?Context $defaultContext = null;
+    /**
+     * @var \Unleash\Client\Configuration\Context|null
+     */
+    private $defaultContext;
 
-    private ?UnleashContextProvider $contextProvider = null;
+    /**
+     * @var \Unleash\Client\ContextProvider\UnleashContextProvider|null
+     */
+    private $contextProvider;
 
-    private ?BootstrapProvider $bootstrapProvider = null;
+    /**
+     * @var \Unleash\Client\Bootstrap\BootstrapProvider|null
+     */
+    private $bootstrapProvider;
 
-    private ?BootstrapHandler $bootstrapHandler = null;
+    /**
+     * @var \Unleash\Client\Bootstrap\BootstrapHandler|null
+     */
+    private $bootstrapHandler;
 
-    private bool $fetchingEnabled = true;
+    /**
+     * @var bool
+     */
+    private $fetchingEnabled = true;
 
     /**
      * @var array<string,string>
      */
-    private array $headers = [];
+    private $headers = [];
 
     /**
      * @var array<StrategyHandler>
      */
-    private array $strategies;
+    private $strategies;
 
     /**
      * @var EventDispatcherInterface|null
      * @noinspection PhpDocFieldTypeMismatchInspection
      */
-    private ?object $eventDispatcher = null;
+    private $eventDispatcher;
 
     /**
      * @var array<EventSubscriberInterface>
      */
-    private array $eventSubscribers = [];
+    private $eventSubscribers = [];
 
     public function __construct()
     {
@@ -186,8 +240,12 @@ final class UnleashBuilder
         return $this->withStrategies(...array_merge($this->strategies, [$strategy]));
     }
 
+    /**
+     * @param \Psr\SimpleCache\CacheInterface|null $cache
+     * @param int|null $timeToLive
+     */
     #[Pure]
-    public function withCacheHandler(?CacheInterface $cache, ?int $timeToLive = null): self
+    public function withCacheHandler($cache, $timeToLive = null): self
     {
         $result = $this->with('cache', $cache);
         if ($timeToLive !== null) {
@@ -242,27 +300,39 @@ final class UnleashBuilder
         return $this->with('metricsInterval', $milliseconds);
     }
 
+    /**
+     * @param \Unleash\Client\Configuration\Context|null $context
+     */
     #[Pure]
     #[Deprecated(reason: 'Context provider support was added, use custom context provider using withContextProvider()')]
-    public function withDefaultContext(?Context $context): self
+    public function withDefaultContext($context): self
     {
         return $this->with('defaultContext', $context);
     }
 
+    /**
+     * @param \Unleash\Client\ContextProvider\UnleashContextProvider|null $contextProvider
+     */
     #[Pure]
-    public function withContextProvider(?UnleashContextProvider $contextProvider): self
+    public function withContextProvider($contextProvider): self
     {
         return $this->with('contextProvider', $contextProvider);
     }
 
+    /**
+     * @param \Unleash\Client\Bootstrap\BootstrapHandler|null $handler
+     */
     #[Pure]
-    public function withBootstrapHandler(?BootstrapHandler $handler): self
+    public function withBootstrapHandler($handler): self
     {
         return $this->with('bootstrapHandler', $handler);
     }
 
+    /**
+     * @param \Unleash\Client\Bootstrap\BootstrapProvider|null $provider
+     */
     #[Pure]
-    public function withBootstrapProvider(?BootstrapProvider $provider): self
+    public function withBootstrapProvider($provider): self
     {
         return $this->with('bootstrapProvider', $provider);
     }
@@ -271,7 +341,7 @@ final class UnleashBuilder
      * @param array<mixed>|Traversable<mixed>|JsonSerializable|null|string $bootstrap
      */
     #[Pure]
-    public function withBootstrap(array|Traversable|JsonSerializable|null|string $bootstrap): self
+    public function withBootstrap($bootstrap): self
     {
         if ($bootstrap === null) {
             $provider = new EmptyBootstrapProvider();
@@ -284,8 +354,11 @@ final class UnleashBuilder
         return $this->withBootstrapProvider($provider);
     }
 
+    /**
+     * @param string|\SplFileInfo|null $file
+     */
     #[Pure]
-    public function withBootstrapFile(string|SplFileInfo|null $file): self
+    public function withBootstrapFile($file): self
     {
         if ($file === null) {
             $provider = new EmptyBootstrapProvider();
@@ -296,8 +369,11 @@ final class UnleashBuilder
         return $this->withBootstrapProvider($provider);
     }
 
+    /**
+     * @param string|null $url
+     */
     #[Pure]
-    public function withBootstrapUrl(?string $url): self
+    public function withBootstrapUrl($url): self
     {
         return $this->withBootstrapFile($url);
     }
@@ -308,8 +384,11 @@ final class UnleashBuilder
         return $this->with('fetchingEnabled', $enabled);
     }
 
+    /**
+     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface|null $eventDispatcher
+     */
     #[Pure]
-    public function withEventDispatcher(?EventDispatcherInterface $eventDispatcher): self
+    public function withEventDispatcher($eventDispatcher): self
     {
         return $this->with('eventDispatcher', $eventDispatcher);
     }
@@ -322,8 +401,11 @@ final class UnleashBuilder
         return $this->with('eventSubscribers', $subscribers);
     }
 
+    /**
+     * @param int|null $ttl
+     */
     #[Pure]
-    public function withStaleTtl(?int $ttl): self
+    public function withStaleTtl($ttl): self
     {
         return $this->with('staleTtl', $ttl);
     }
@@ -335,9 +417,9 @@ final class UnleashBuilder
         $appName = $this->appName;
 
         if (!$this->fetchingEnabled) {
-            $appUrl ??= 'http://127.0.0.1';
-            $instanceId ??= 'dev';
-            $appName ??= 'dev';
+            $appUrl = $appUrl ?? 'http://127.0.0.1';
+            $instanceId = $instanceId ?? 'dev';
+            $appName = $appName ?? 'dev';
         }
 
         if ($appUrl === null) {
@@ -401,9 +483,7 @@ final class UnleashBuilder
         if ($httpClient === null) {
             $httpClient = $this->defaultImplementationLocator->findHttpClient();
             if ($httpClient === null) {
-                throw new InvalidValueException(
-                    "No http client provided, please use 'withHttpClient()' method or install a package providing 'psr/http-client-implementation'.",
-                );
+                throw new InvalidValueException("No http client provided, please use 'withHttpClient()' method or install a package providing 'psr/http-client-implementation'.");
             }
         }
         assert($httpClient instanceof ClientInterface);
@@ -420,9 +500,7 @@ final class UnleashBuilder
              */
             // @codeCoverageIgnoreStart
             if ($requestFactory === null) {
-                throw new InvalidValueException(
-                    "No request factory provided, please use 'withRequestFactory()' method or install a package providing 'psr/http-factory-implementation'.",
-                );
+                throw new InvalidValueException("No request factory provided, please use 'withRequestFactory()' method or install a package providing 'psr/http-factory-implementation'.");
             }
             // @codeCoverageIgnoreEnd
         }
@@ -437,24 +515,16 @@ final class UnleashBuilder
             $registrationService = new DefaultRegistrationService($httpClient, $requestFactory, $configuration);
         }
 
-        return new DefaultUnleash(
-            $this->strategies,
-            $repository,
-            $registrationService,
-            $configuration,
-            new DefaultMetricsHandler(
-                new DefaultMetricsSender(
-                    $httpClient,
-                    $requestFactory,
-                    $configuration,
-                ),
-                $configuration
-            ),
-            new DefaultVariantHandler($hashCalculator),
-        );
+        return new DefaultUnleash($this->strategies, $repository, $registrationService, $configuration, new DefaultMetricsHandler(
+            new DefaultMetricsSender($httpClient, $requestFactory, $configuration),
+            $configuration
+        ), new DefaultVariantHandler($hashCalculator));
     }
 
-    private function with(string $property, mixed $value): self
+    /**
+     * @param mixed $value
+     */
+    private function with(string $property, $value): self
     {
         $copy = clone $this;
         $copy->{$property} = $value;

@@ -6,10 +6,14 @@ use Unleash\Client\DTO\Feature;
 
 interface UnleashRepository
 {
-    public function findFeature(string $featureName): ?Feature;
+    /**
+     * @param string $featureName
+     * @return \Unleash\Client\DTO\Feature|null
+     */
+    public function findFeature($featureName);
 
     /**
-     * @return iterable<Feature>
+     * @return mixed[]
      */
-    public function getFeatures(): iterable;
+    public function getFeatures();
 }

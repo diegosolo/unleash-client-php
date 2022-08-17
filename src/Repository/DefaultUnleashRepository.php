@@ -39,19 +39,35 @@ use Unleash\Client\Exception\InvalidValueException;
  */
 final class DefaultUnleashRepository implements UnleashRepository
 {
-    public function __construct(
-        private readonly ClientInterface $httpClient,
-        private readonly RequestFactoryInterface $requestFactory,
-        private readonly UnleashConfiguration $configuration,
-    ) {
+    /**
+     * @readonly
+     * @var \Psr\Http\Client\ClientInterface
+     */
+    private $httpClient;
+    /**
+     * @readonly
+     * @var \Psr\Http\Message\RequestFactoryInterface
+     */
+    private $requestFactory;
+    /**
+     * @readonly
+     * @var \Unleash\Client\Configuration\UnleashConfiguration
+     */
+    private $configuration;
+    public function __construct(ClientInterface $httpClient, RequestFactoryInterface $requestFactory, UnleashConfiguration $configuration)
+    {
+        $this->httpClient = $httpClient;
+        $this->requestFactory = $requestFactory;
+        $this->configuration = $configuration;
     }
-
     /**
      * @throws ClientExceptionInterface
      * @throws InvalidArgumentException
      * @throws JsonException
+     * @param string $featureName
+     * @return \Unleash\Client\DTO\Feature|null
      */
-    public function findFeature(string $featureName): ?Feature
+    public function findFeature($featureName)
     {
         $features = $this->getFeatures();
         assert(is_array($features));
@@ -64,9 +80,9 @@ final class DefaultUnleashRepository implements UnleashRepository
      * @throws ClientExceptionInterface
      * @throws JsonException
      *
-     * @return iterable<Feature>
+     * @return mixed[]
      */
-    public function getFeatures(): iterable
+    public function getFeatures()
     {
         $features = $this->getCachedFeatures();
         if ($features === null) {
@@ -93,13 +109,10 @@ final class DefaultUnleashRepository implements UnleashRepository
                         $this->setLastValidState($data);
                     }
                 } catch (Exception $exception) {
-                    $this->configuration->getEventDispatcher()->dispatch(
-                        new FetchingDataFailedEvent($exception),
-                        UnleashEvents::FETCHING_DATA_FAILED,
-                    );
+                    $this->configuration->getEventDispatcher()->dispatch(new FetchingDataFailedEvent($exception), UnleashEvents::FETCHING_DATA_FAILED);
                     $data = $this->getLastValidState();
                 }
-                $data ??= $this->getBootstrappedResponse();
+                $data = $data ?? $this->getBootstrappedResponse();
                 if ($data === null) {
                     throw new HttpResponseException(sprintf(
                         'Got invalid response code when getting features and no default bootstrap provided: %s',
@@ -118,9 +131,9 @@ final class DefaultUnleashRepository implements UnleashRepository
     /**
      * @throws InvalidArgumentException
      *
-     * @return array<Feature>|null
+     * @return mixed[]|null
      */
-    private function getCachedFeatures(): ?array
+    private function getCachedFeatures()
     {
         $cache = $this->configuration->getCache();
 
@@ -138,8 +151,9 @@ final class DefaultUnleashRepository implements UnleashRepository
      * @param array<Feature> $features
      *
      * @throws InvalidArgumentException
+     * @return void
      */
-    private function setCache(array $features): void
+    private function setCache(array $features)
     {
         $cache = $this->configuration->getCache();
         $cache->set(CacheKey::FEATURES, $features, $this->configuration->getTtl());
@@ -153,7 +167,7 @@ final class DefaultUnleashRepository implements UnleashRepository
     private function parseFeatures(string $rawBody): array
     {
         $features = [];
-        $body = json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR);
+        $body = json_decode($rawBody, true, 512, 0);
         assert(is_array($body));
 
         $globalSegments = $this->parseSegments($body['segments'] ?? []);
@@ -179,51 +193,36 @@ final class DefaultUnleashRepository implements UnleashRepository
                         break;
                     }
                 }
-                $strategies[] = new DefaultStrategy(
-                    $strategy['name'],
-                    $strategy['parameters'] ?? [],
-                    $constraints,
-                    $segments,
-                    $hasNonexistentSegments,
-                );
+                $strategies[] = new DefaultStrategy($strategy['name'], $strategy['parameters'] ?? [], $constraints, $segments, $hasNonexistentSegments);
             }
             foreach ($feature['variants'] ?? [] as $variant) {
                 $overrides = [];
                 foreach ($variant['overrides'] ?? [] as $override) {
                     $overrides[] = new DefaultVariantOverride($override['contextName'], $override['values']);
                 }
-                $variants[] = new DefaultVariant(
-                    $variant['name'],
-                    true,
-                    $variant['weight'],
-                    $variant['stickiness'] ?? Stickiness::DEFAULT,
-                    isset($variant['payload'])
-                        ? new DefaultVariantPayload($variant['payload']['type'], $variant['payload']['value'])
-                        : null,
-                    $overrides,
-                );
+                $variants[] = new DefaultVariant($variant['name'], true, $variant['weight'], $variant['stickiness'] ?? Stickiness::DEFAULT, isset($variant['payload'])
+                    ? new DefaultVariantPayload($variant['payload']['type'], $variant['payload']['value'])
+                    : null, $overrides);
             }
 
-            $features[$feature['name']] = new DefaultFeature(
-                $feature['name'],
-                $feature['enabled'],
-                $strategies,
-                $variants,
-                $feature['impressionData'] ?? false,
-            );
+            $features[$feature['name']] = new DefaultFeature($feature['name'], $feature['enabled'], $strategies, $variants, $feature['impressionData'] ?? false);
         }
 
         return $features;
     }
 
-    private function getBootstrappedResponse(): ?string
+    /**
+     * @return string|null
+     */
+    private function getBootstrappedResponse()
     {
-        return $this->configuration->getBootstrapHandler()->getBootstrapContents(
-            $this->configuration->getBootstrapProvider(),
-        );
+        return $this->configuration->getBootstrapHandler()->getBootstrapContents($this->configuration->getBootstrapProvider());
     }
 
-    private function getLastValidState(): ?string
+    /**
+     * @return string|null
+     */
+    private function getLastValidState()
     {
         if (!$this->configuration->getCache()->has(CacheKey::FEATURES_RESPONSE)) {
             return null;
@@ -235,13 +234,12 @@ final class DefaultUnleashRepository implements UnleashRepository
         return $value;
     }
 
-    private function setLastValidState(string $data): void
+    /**
+     * @return void
+     */
+    private function setLastValidState(string $data)
     {
-        $this->configuration->getCache()->set(
-            CacheKey::FEATURES_RESPONSE,
-            $data,
-            $this->configuration->getStaleTtl(),
-        );
+        $this->configuration->getCache()->set(CacheKey::FEATURES_RESPONSE, $data, $this->configuration->getStaleTtl());
     }
 
     /**
@@ -253,10 +251,7 @@ final class DefaultUnleashRepository implements UnleashRepository
     {
         $result = [];
         foreach ($segmentsRaw as $segmentRaw) {
-            $result[$segmentRaw['id']] = new DefaultSegment(
-                $segmentRaw['id'],
-                $this->parseConstraints($segmentRaw['constraints']),
-            );
+            $result[$segmentRaw['id']] = new DefaultSegment($segmentRaw['id'], $this->parseConstraints($segmentRaw['constraints']));
         }
 
         return $result;
@@ -272,14 +267,7 @@ final class DefaultUnleashRepository implements UnleashRepository
         $constraints = [];
 
         foreach ($constraintsRaw as $constraint) {
-            $constraints[] = new DefaultConstraint(
-                $constraint['contextName'],
-                $constraint['operator'],
-                $constraint['values'] ?? null,
-                $constraint['value'] ?? null,
-                $constraint['inverted'] ?? false,
-                $constraint['caseInsensitive'] ?? false,
-            );
+            $constraints[] = new DefaultConstraint($constraint['contextName'], $constraint['operator'], $constraint['values'] ?? null, $constraint['value'] ?? null, $constraint['inverted'] ?? false, $constraint['caseInsensitive'] ?? false);
         }
 
         return $constraints;

@@ -20,7 +20,7 @@ interface Constraint
     public function getOperator(): string;
 
     /**
-     * @return array<string>|null
+     * @return mixed[]|null
      */
-    public function getValues(): ?array;
+    public function getValues();
 }

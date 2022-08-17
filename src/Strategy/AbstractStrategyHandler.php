@@ -11,19 +11,31 @@ abstract class AbstractStrategyHandler implements StrategyHandler
 {
     use ConstraintValidatorTrait;
 
-    public function supports(Strategy $strategy): bool
+    /**
+     * @param \Unleash\Client\DTO\Strategy $strategy
+     */
+    public function supports($strategy): bool
     {
         return $strategy->getName() === $this->getStrategyName();
     }
 
-    protected function findParameter(string $parameter, Strategy $strategy): ?string
+    /**
+     * @param string $parameter
+     * @param \Unleash\Client\DTO\Strategy $strategy
+     * @return string|null
+     */
+    protected function findParameter($parameter, $strategy)
     {
         $parameters = $strategy->getParameters();
 
         return $parameters[$parameter] ?? null;
     }
 
-    protected function validateConstraints(Strategy $strategy, Context $context): bool
+    /**
+     * @param \Unleash\Client\DTO\Strategy $strategy
+     * @param \Unleash\Client\Configuration\Context $context
+     */
+    protected function validateConstraints($strategy, $context): bool
     {
         if (method_exists($strategy, 'hasNonexistentSegments') && $strategy->hasNonexistentSegments()) {
             return false;
@@ -42,9 +54,9 @@ abstract class AbstractStrategyHandler implements StrategyHandler
     }
 
     /**
-     * @return iterable<Constraint>
+     * @return mixed[]
      */
-    private function getConstraintsForStrategy(Strategy $strategy): iterable
+    private function getConstraintsForStrategy(Strategy $strategy)
     {
         yield from $strategy->getConstraints();
 

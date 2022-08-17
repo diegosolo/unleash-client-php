@@ -4,5 +4,9 @@ namespace Unleash\Client\Metrics;
 
 interface MetricsSender
 {
-    public function sendMetrics(MetricsBucket $bucket): void;
+    /**
+     * @param \Unleash\Client\Metrics\MetricsBucket $bucket
+     * @return void
+     */
+    public function sendMetrics($bucket);
 }

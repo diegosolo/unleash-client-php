@@ -7,10 +7,14 @@ namespace Unleash\Client\ConstraintValidator\Operator\String;
  */
 final class StringContainsOperatorValidator extends AbstractStringOperatorValidator
 {
-    protected function validate(string $currentValue, array|string $searchInValue): bool
+    /**
+     * @param mixed[]|string $searchInValue
+     * @param string $currentValue
+     */
+    protected function validate($currentValue, $searchInValue): bool
     {
         assert(is_string($searchInValue));
 
-        return str_contains($currentValue, $searchInValue);
+        return strpos($currentValue, $searchInValue) !== false;
     }
 }
